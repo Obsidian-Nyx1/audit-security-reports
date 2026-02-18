@@ -10,10 +10,12 @@ from __future__ import annotations
 import argparse
 import datetime as dt
 import json
+import os
 import random
 import re
 import subprocess
 import sys
+import time
 import xml.etree.ElementTree as ET
 import zipfile
 from dataclasses import dataclass
@@ -120,36 +122,39 @@ class ControlResult:
 
 def banner() -> None:
     art = [
-        "============================================",
-        "  AuditSploit Console :: Offensive QA Mode ",
-        "============================================",
+        "  [..,..]====================================================[.,..]",
+        "  [.,..]  AuditSploit Console :: Offensive QA / Report Forge [..,.]",
+        "  {..,..}===================================================={.,..}",
     ]
-    print("\n".join(art))
-    print(f"joke> {random.choice(JOKES)}")
+    for line in art:
+        print(colorize(line, "cyan"))
+    print(colorize("  [*] mode: msf-inspired operator console", "green"))
+    print(colorize(f"  [*] joke> {random.choice(JOKES)}", "yellow"))
     print()
 
 
 def usage_hint() -> None:
-    print("Usage examples:")
-    print('  ./audit_agent.py "example.doc" --output-format pdf')
-    print('  ./audit_agent.py "example.pdf" --output-format doc')
-    print('  ./audit_agent.py "/full/path/to/example.xml" --output-format pdf')
+    print(colorize("[.] Usage examples", "blue"))
+    print(colorize('  [1] ./audit_agent.py "example.doc" --output-format pdf', "white"))
+    print(colorize('  [2] ./audit_agent.py "example.pdf" --output-format doc', "white"))
+    print(colorize('  [3] ./audit_agent.py "/full/path/to/example.xml" --output-format pdf', "white"))
     print()
 
 
 def print_profile_menu() -> None:
-    print("Select report type:")
+    print(colorize("[.] Select report type", "magenta"))
     for i, (_, name, desc) in enumerate(PROFILE_MENU, start=1):
-        print(f"  {i}. {name} - {desc}")
+        idx = colorize(f"[{i:>2}]", "cyan")
+        print(f"  {idx} {colorize(name, 'green')} :: {desc}")
     print()
 
 
 def choose_profile_interactive() -> str:
     while True:
-        selected = input("press number (1-10) [1]: ").strip() or "1"
+        selected = input(colorize("select profile number (1-10) [1]: ", "yellow")).strip() or "1"
         if selected in PROFILE_BY_INDEX:
             return PROFILE_BY_INDEX[selected]
-        print("Invalid selection. Choose 1-10.")
+        print(colorize("[!] Invalid selection. Choose 1-10.", "red"))
 
 
 def load_catalog(path: Path) -> List[Dict]:
@@ -419,13 +424,91 @@ def write_markdown(results: List[ControlResult], out_path: Path, metadata: Dict[
 
 
 def markdown_to_html(markdown_text: str, title: str) -> str:
-    escaped = markdown_text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
-    body = "<br>".join(escaped.splitlines())
+    def esc(text: str) -> str:
+        return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+
+    blocks: List[str] = []
+    in_list = False
+    in_table = False
+    table_header_written = False
+
+    def close_list() -> None:
+        nonlocal in_list
+        if in_list:
+            blocks.append("</ul>")
+            in_list = False
+
+    def close_table() -> None:
+        nonlocal in_table, table_header_written
+        if in_table:
+            if table_header_written:
+                blocks.append("</tbody>")
+            blocks.append("</table>")
+            in_table = False
+            table_header_written = False
+
+    for raw in markdown_text.splitlines():
+        line = raw.rstrip()
+
+        if not line.strip():
+            close_list()
+            close_table()
+            continue
+
+        if line.startswith("# "):
+            close_list()
+            close_table()
+            blocks.append(f"<h1>{esc(line[2:].strip())}</h1>")
+            continue
+
+        if line.startswith("## "):
+            close_list()
+            close_table()
+            blocks.append(f"<h2>{esc(line[3:].strip())}</h2>")
+            continue
+
+        if line.startswith("- "):
+            close_table()
+            if not in_list:
+                blocks.append("<ul>")
+                in_list = True
+            blocks.append(f"<li>{esc(line[2:].strip())}</li>")
+            continue
+
+        if line.startswith("|") and line.endswith("|"):
+            close_list()
+            cells = [esc(c.strip()) for c in line.strip("|").split("|")]
+            if all(set(c) <= {"-"} and c for c in cells):
+                continue
+            if not in_table:
+                blocks.append("<table>")
+                in_table = True
+                table_header_written = False
+            if not table_header_written:
+                blocks.append("<thead><tr>" + "".join(f"<th>{c}</th>" for c in cells) + "</tr></thead><tbody>")
+                table_header_written = True
+            else:
+                blocks.append("<tr>" + "".join(f"<td>{c}</td>" for c in cells) + "</tr>")
+            continue
+
+        close_list()
+        close_table()
+        blocks.append(f"<p>{esc(line)}</p>")
+
+    close_list()
+    close_table()
+    body = "\n".join(blocks)
     return (
         "<html><head><meta charset='utf-8'><title>"
-        + title
-        + "</title><style>body{font-family:Calibri,Arial,sans-serif;font-size:11pt;line-height:1.4;margin:1in;}"
-        "h1,h2{color:#0d2a4a;} table{border-collapse:collapse;}"
+        + esc(title)
+        + "</title><style>"
+        "body{font-family:'Times New Roman',Times,serif;font-size:12pt;line-height:1.45;margin:1in;color:#111;}"
+        "h1{font-size:22pt;margin:0 0 14pt 0;color:#0e2439;border-bottom:1px solid #b8c4cf;padding-bottom:6pt;}"
+        "h2{font-size:15pt;margin:18pt 0 8pt 0;color:#123a5f;}"
+        "p{margin:0 0 8pt 0;} ul{margin:0 0 10pt 18pt;padding:0;} li{margin:0 0 4pt 0;}"
+        "table{width:100%;border-collapse:collapse;margin:8pt 0 12pt 0;}"
+        "th,td{border:1px solid #9aa7b3;padding:6pt;vertical-align:top;}"
+        "th{background:#eef2f6;text-align:left;font-weight:bold;}"
         "</style></head><body>"
         + body
         + "</body></html>"
@@ -542,28 +625,80 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
+def _supports_color() -> bool:
+    return sys.stdout.isatty() and os.getenv("TERM", "").lower() != "dumb"
+
+
+USE_COLOR = _supports_color()
+
+ANSI_COLORS = {
+    "reset": "\033[0m",
+    "bold": "\033[1m",
+    "red": "\033[31m",
+    "green": "\033[32m",
+    "yellow": "\033[33m",
+    "blue": "\033[34m",
+    "magenta": "\033[35m",
+    "cyan": "\033[36m",
+    "white": "\033[37m",
+}
+
+
+def colorize(text: str, color: str) -> str:
+    if not USE_COLOR:
+        return text
+    code = ANSI_COLORS.get(color, "")
+    reset = ANSI_COLORS["reset"] if code else ""
+    return f"{code}{text}{reset}"
+
+
+def animate_console(message: str, cycles: int = 14, delay: float = 0.06) -> None:
+    if not sys.stdout.isatty():
+        print(f"{message} ...")
+        return
+
+    frames = [
+        "[.,..]",
+        "[..,.]",
+        "[..,..]",
+        "{.,..}",
+        "{..,.}",
+        "(.,..)",
+        "(..,.)",
+        "(..,..)",
+    ]
+    for i in range(cycles):
+        frame = frames[i % len(frames)]
+        line = f"\r{colorize(frame, 'cyan')} {colorize(message, 'white')}"
+        print(line, end="", flush=True)
+        time.sleep(delay)
+    print(f"\r{colorize('[ ok ]', 'green')} {message}{' ' * 24}")
+
+
 def list_profiles() -> None:
     print_profile_menu()
 
 
 def interactive_inputs(args: argparse.Namespace) -> argparse.Namespace:
     banner()
+    animate_console("Initializing modules")
+    animate_console("Loading control intelligence")
     usage_hint()
     print_profile_menu()
     args.profile = choose_profile_interactive()
 
-    print("Enter report file/path (single file or comma-separated list):")
-    raw_files = input("> ").strip()
+    print(colorize("[.] Enter report file/path (single file or comma-separated list):", "blue"))
+    raw_files = input(colorize("  > ", "cyan")).strip()
     args.input = [raw_files] if raw_files else []
 
-    fmt = input("Preferred output format (doc/pdf) [pdf]: ").strip().lower()
+    fmt = input(colorize("preferred output format (doc/pdf) [pdf]: ", "yellow")).strip().lower()
     if fmt in {"doc", "pdf"}:
         args.output_format = fmt
 
-    pname = input("Project name [Security Audit Engagement]: ").strip()
+    pname = input(colorize("project name [Security Audit Engagement]: ", "yellow")).strip()
     args.project_name = pname or "Security Audit Engagement"
 
-    oname = input("Output filename [security_audit_report]: ").strip()
+    oname = input(colorize("output filename [security_audit_report]: ", "yellow")).strip()
     if oname:
         args.output_name = oname
     return args
@@ -589,6 +724,7 @@ def main() -> None:
     if args.interactive or len(sys.argv) == 1:
         args = interactive_inputs(args)
 
+    animate_console("Parsing report inputs")
     controls = filter_controls_by_profile(load_catalog(Path(args.catalog)), args.profile)
     reports = resolve_reports(args)
     if not reports:
@@ -596,6 +732,7 @@ def main() -> None:
     if not controls:
         raise SystemExit(f"No controls mapped for selected profile '{args.profile}'.")
 
+    animate_console("Evaluating controls")
     results = evaluate_controls(controls, reports)
     profile_name = PROFILE_LOOKUP.get(args.profile, {}).get("name", args.profile)
     metadata: Dict[str, object] = {
@@ -614,15 +751,20 @@ def main() -> None:
 
     final_report = output_dir / f"{args.output_name}.{args.output_format}"
     if args.output_format == "doc":
+        animate_console("Rendering DOC report")
         write_doc_report(markdown_report, final_report, args.output_name)
     else:
+        animate_console("Rendering PDF report")
         write_pdf_report(markdown_report, final_report)
 
     p, q, f = summarize(results)
-    print(f"Assessment complete. Profile={profile_name} PASS={p} PARTIAL={q} FAIL={f}")
-    print(f"- JSON: {json_out}")
-    print(f"- Markdown: {md_out}")
-    print(f"- Final report: {final_report}")
+    pass_label = colorize(f"PASS={p}", "green")
+    partial_label = colorize(f"PARTIAL={q}", "yellow")
+    fail_label = colorize(f"FAIL={f}", "red")
+    print(colorize(f"[+] Assessment complete. Profile={profile_name} {pass_label} {partial_label} {fail_label}", "white"))
+    print(colorize(f"  [>] JSON: {json_out}", "cyan"))
+    print(colorize(f"  [>] Markdown: {md_out}", "cyan"))
+    print(colorize(f"  [>] Final report: {final_report}", "cyan"))
 
 
 if __name__ == "__main__":
