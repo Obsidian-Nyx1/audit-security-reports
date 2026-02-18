@@ -9,7 +9,7 @@ Run:
 ```
 
 Then:
-1. MSF-style title + rotating joke appears.
+1. Console title + rotating joke appears.
 2. Usage help appears.
 3. You select a report type (`press number 1-10`).
 4. You provide report file/path.

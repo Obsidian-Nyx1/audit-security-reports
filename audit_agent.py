@@ -65,6 +65,13 @@ JOKES = [
     "Your SOC called; it wants cleaner indicators and fewer surprises.",
 ]
 
+CONSOLE_TAGLINES = [
+    "Turning raw findings into executive-grade evidence.",
+    "Signal over noise, evidence over guesswork.",
+    "Built for operators who also care about documentation quality.",
+    "Every control gets context, every gap gets clarity.",
+]
+
 PROFILE_RECOMMENDATIONS = {
     "pentest_general": [
         "Ensure every finding has reproducible steps, impact, and business risk.",
@@ -122,13 +129,13 @@ class ControlResult:
 
 def banner() -> None:
     art = [
-        "  [..,..]====================================================[.,..]",
-        "  [.,..]  AuditSploit Console :: Offensive QA / Report Forge [..,.]",
-        "  {..,..}===================================================={.,..}",
+        "  ,.:[]:.,----------------------------------------------------,.:[]:.,",
+        "  [ audit-forge ]    CIPHER TRACE WORKBENCH    [ evidence-lab ]",
+        "  `:.,[]:.'----------------------------------------------------`:.,[]:.'",
     ]
     for line in art:
         print(colorize(line, "cyan"))
-    print(colorize("  [*] mode: msf-inspired operator console", "green"))
+    print(colorize(f"  [*] {random.choice(CONSOLE_TAGLINES)}", "green"))
     print(colorize(f"  [*] joke> {random.choice(JOKES)}", "yellow"))
     print()
 
@@ -658,14 +665,14 @@ def animate_console(message: str, cycles: int = 14, delay: float = 0.06) -> None
         return
 
     frames = [
-        "[.,..]",
-        "[..,.]",
-        "[..,..]",
-        "{.,..}",
-        "{..,.}",
-        "(.,..)",
-        "(..,.)",
-        "(..,..)",
+        "[.:,]",
+        "{:..}",
+        "(.,:)",
+        "<..,>",
+        "[,::]",
+        "{.,.}",
+        "(::,)",
+        "<,.:>",
     ]
     for i in range(cycles):
         frame = frames[i % len(frames)]
