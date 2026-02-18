@@ -1,0 +1,10 @@
+# Python
+__pycache__/
+*.pyc
+
+# Local outputs
+output/
+
+# OS/editor
+.DS_Store
+Thumbs.db

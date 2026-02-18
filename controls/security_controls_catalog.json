@@ -1,0 +1,158 @@
+{
+  "controls": [
+    {
+      "id": "OFF-01",
+      "title": "Scope and Rules of Engagement clarity",
+      "frameworks": ["PTES", "NIST SP 800-115"],
+      "profiles": ["all"],
+      "required_keywords": ["scope", "rules of engagement", "authorized", "timeline", "limitations"]
+    },
+    {
+      "id": "OFF-02",
+      "title": "Methodology transparency",
+      "frameworks": ["PTES", "OSSTMM", "NIST SP 800-115"],
+      "profiles": ["all"],
+      "required_keywords": ["methodology", "reconnaissance", "exploitation", "post-exploitation", "validation"]
+    },
+    {
+      "id": "OFF-03",
+      "title": "Finding quality and reproducibility",
+      "frameworks": ["PTES", "OWASP Testing Guide"],
+      "profiles": ["all"],
+      "required_keywords": ["finding", "evidence", "steps to reproduce", "impact", "remediation"]
+    },
+    {
+      "id": "OFF-04",
+      "title": "Severity and risk prioritization",
+      "frameworks": ["CVSS", "FIRST", "NIST"],
+      "profiles": ["all"],
+      "required_keywords": ["severity", "cvss", "risk", "likelihood", "business impact"]
+    },
+    {
+      "id": "OFF-05",
+      "title": "Retest and closure evidence",
+      "frameworks": ["PTES", "SOC 2"],
+      "profiles": ["all"],
+      "required_keywords": ["retest", "status", "resolved", "open", "verification"]
+    },
+    {
+      "id": "WEB-01",
+      "title": "OWASP web vulnerability mapping",
+      "frameworks": ["OWASP Top 10", "OWASP ASVS"],
+      "profiles": ["web_pentest", "pentest_general"],
+      "required_keywords": ["owasp", "injection", "xss", "access control", "csrf"]
+    },
+    {
+      "id": "WEB-02",
+      "title": "API security coverage",
+      "frameworks": ["OWASP API Security"],
+      "profiles": ["web_pentest", "pentest_general"],
+      "required_keywords": ["api", "authentication", "authorization", "rate limit", "endpoint"]
+    },
+    {
+      "id": "INT-01",
+      "title": "Internal lateral movement narrative",
+      "frameworks": ["MITRE ATT&CK", "PTES"],
+      "profiles": ["internal_pentest", "pentest_general", "ad_assessment"],
+      "required_keywords": ["lateral movement", "pivot", "credential", "privilege escalation", "segmentation"]
+    },
+    {
+      "id": "INT-02",
+      "title": "Active Directory abuse coverage",
+      "frameworks": ["MITRE ATT&CK", "Microsoft Security Baselines"],
+      "profiles": ["internal_pentest", "ad_assessment", "pentest_general"],
+      "required_keywords": ["active directory", "kerberoast", "delegation", "domain admin", "gpo"]
+    },
+    {
+      "id": "EXT-01",
+      "title": "External exposure validation",
+      "frameworks": ["NIST", "CIS"],
+      "profiles": ["external_pentest", "pentest_general"],
+      "required_keywords": ["external", "internet-facing", "attack surface", "open port", "service"]
+    },
+    {
+      "id": "EXT-02",
+      "title": "Boundary control bypass evidence",
+      "frameworks": ["NIST", "PTES"],
+      "profiles": ["external_pentest", "red_team", "pentest_general"],
+      "required_keywords": ["firewall", "waf", "bypass", "perimeter", "remote exploit"]
+    },
+    {
+      "id": "RED-01",
+      "title": "Objective-based operation tracking",
+      "frameworks": ["MITRE ATT&CK", "NIST 800-61"],
+      "profiles": ["red_team", "adversary_emulation"],
+      "required_keywords": ["objective", "operation", "initial access", "command and control", "mission impact"]
+    },
+    {
+      "id": "RED-02",
+      "title": "Stealth and detection bypass reporting",
+      "frameworks": ["MITRE ATT&CK", "SOC 2 CC7"],
+      "profiles": ["red_team", "adversary_emulation"],
+      "required_keywords": ["evasion", "detection", "bypass", "telemetry", "blind spot"]
+    },
+    {
+      "id": "PUR-01",
+      "title": "ATT&CK technique-to-detection mapping",
+      "frameworks": ["MITRE ATT&CK", "Purple Teaming"],
+      "profiles": ["purple_team", "adversary_emulation"],
+      "required_keywords": ["mitre", "technique", "detection", "coverage", "tuning"]
+    },
+    {
+      "id": "PUR-02",
+      "title": "Before/after control improvement evidence",
+      "frameworks": ["NIST", "SOC 2"],
+      "profiles": ["purple_team"],
+      "required_keywords": ["before", "after", "improvement", "mttd", "mttr"]
+    },
+    {
+      "id": "ADV-01",
+      "title": "Threat emulation fidelity",
+      "frameworks": ["MITRE ATT&CK", "NIST SP 800-115"],
+      "profiles": ["adversary_emulation", "red_team"],
+      "required_keywords": ["emulation", "threat actor", "playbook", "sequence", "fidelity"]
+    },
+    {
+      "id": "PHI-01",
+      "title": "Phishing campaign measurement",
+      "frameworks": ["NIST", "Awareness Programs"],
+      "profiles": ["phishing_assessment"],
+      "required_keywords": ["phishing", "click rate", "credential submission", "campaign", "user awareness"]
+    },
+    {
+      "id": "PHI-02",
+      "title": "Social engineering control effectiveness",
+      "frameworks": ["NIST", "ISO 27001"],
+      "profiles": ["phishing_assessment"],
+      "required_keywords": ["social engineering", "pretext", "verification", "policy", "training"]
+    },
+    {
+      "id": "WIR-01",
+      "title": "Wireless encryption and auth weaknesses",
+      "frameworks": ["NIST", "CIS"],
+      "profiles": ["wireless_assessment"],
+      "required_keywords": ["wireless", "wpa2", "wpa3", "authentication", "encryption"]
+    },
+    {
+      "id": "WIR-02",
+      "title": "Rogue AP and lateral risk analysis",
+      "frameworks": ["NIST", "CIS"],
+      "profiles": ["wireless_assessment"],
+      "required_keywords": ["rogue ap", "ssid", "evil twin", "client isolation", "network access"]
+    },
+    {
+      "id": "AD-01",
+      "title": "Privilege path and identity tiering analysis",
+      "frameworks": ["MITRE ATT&CK", "Microsoft ESAE"],
+      "profiles": ["ad_assessment", "internal_pentest"],
+      "required_keywords": ["tiering", "privilege", "path", "admin", "identity"]
+    },
+    {
+      "id": "AD-02",
+      "title": "Credential hygiene and delegation risks",
+      "frameworks": ["Microsoft Security", "NIST"],
+      "profiles": ["ad_assessment", "internal_pentest"],
+      "required_keywords": ["credential", "reuse", "delegation", "password", "service account"]
+    }
+  ]
+}
