@@ -128,13 +128,35 @@ class ControlResult:
 
 
 def banner() -> None:
-    art = [
-        "  ,.:[]:.,----------------------------------------------------,.:[]:.,",
-        "  [ audit-forge ]    CIPHER TRACE WORKBENCH    [ evidence-lab ]",
-        "  `:.,[]:.'----------------------------------------------------`:.,[]:.'",
+    frame_top = "  ,.:[]:.,------------------------------------------------------------,.:[]:.,"
+    frame_bottom = "  `:.,[]:.'------------------------------------------------------------`:.,[]:.'"
+    title_art = [
+        "   ██████╗██╗██████╗ ██╗  ██╗███████╗██████╗     ████████╗██████╗  █████╗  ██████╗███████╗",
+        "  ██╔════╝██║██╔══██╗██║  ██║██╔════╝██╔══██╗    ╚══██╔══╝██╔══██╗██╔══██╗██╔════╝██╔════╝",
+        "  ██║     ██║██████╔╝███████║█████╗  ██████╔╝       ██║   ██████╔╝███████║██║     █████╗  ",
+        "  ██║     ██║██╔═══╝ ██╔══██║██╔══╝  ██╔══██╗       ██║   ██╔══██╗██╔══██║██║     ██╔══╝  ",
+        "  ╚██████╗██║██║     ██║  ██║███████╗██║  ██║       ██║   ██║  ██║██║  ██║╚██████╗███████╗",
+        "   ╚═════╝╚═╝╚═╝     ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝       ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝╚══════╝",
+        "                                  W O R K B E N C H",
     ]
-    for line in art:
-        print(colorize(line, "cyan"))
+    jay_art = [
+        "      __",
+        "   .-(  ).",
+        "  (___.__)__",
+        "    /|  /|",
+        "   /_| /_|",
+        "   blue-jay",
+        "",
+    ]
+
+    print(colorize(frame_top, "cyan"))
+    for i, line in enumerate(title_art):
+        jay = jay_art[i] if i < len(jay_art) else ""
+        if jay:
+            print(f"{colorize(line, 'cyan')}  {colorize(jay, 'blue')}")
+        else:
+            print(colorize(line, "cyan"))
+    print(colorize(frame_bottom, "cyan"))
     print(colorize(f"  [*] {random.choice(CONSOLE_TAGLINES)}", "green"))
     print(colorize(f"  [*] joke> {random.choice(JOKES)}", "yellow"))
     print()
@@ -153,15 +175,18 @@ def print_profile_menu() -> None:
     for i, (_, name, desc) in enumerate(PROFILE_MENU, start=1):
         idx = colorize(f"[{i:>2}]", "cyan")
         print(f"  {idx} {colorize(name, 'green')} :: {desc}")
+    print(f"  {colorize('[ 0]', 'cyan')} {colorize('Exit', 'red')} :: Quit interactive mode.")
     print()
 
 
 def choose_profile_interactive() -> str:
     while True:
-        selected = input(colorize("select profile number (1-10) [1]: ", "yellow")).strip() or "1"
+        selected = input(colorize("select profile number (1-10, or 0 to exit) [1]: ", "yellow")).strip() or "1"
+        if selected == "0":
+            raise SystemExit("Exited by user.")
         if selected in PROFILE_BY_INDEX:
             return PROFILE_BY_INDEX[selected]
-        print(colorize("[!] Invalid selection. Choose 1-10.", "red"))
+        print(colorize("[!] Invalid selection. Choose 1-10, or 0 to exit.", "red"))
 
 
 def load_catalog(path: Path) -> List[Dict]:
